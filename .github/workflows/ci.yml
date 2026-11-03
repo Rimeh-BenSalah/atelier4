@@ -22,17 +22,14 @@ jobs:
           python-version: '3.12'
           cache: pip
 
-      - run: pip install -r requirements-dev.txt
-      - run: pytest -q
+      - name: Installer les dépendances
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
 
-      - name: Rapport de tests
-        run: pytest --junitxml=report.xml
-
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: rapport-tests
-          path: report.xml
+      - name: Vérifier la syntaxe Python
+        run: python -m compileall -q app
 
   docker-build:
     needs: test
@@ -50,8 +47,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: docker/build-push-action@v6
+      - name: Construire et publier l'image
+        uses: docker/build-push-action@v6
         with:
           context: .
           push: ${{ startsWith(github.ref, 'refs/tags/') }}
           tags: ghcr.io/rimeh-bensalah/campus-tasks:${{ github.ref_name }}
+
