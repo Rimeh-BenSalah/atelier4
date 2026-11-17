@@ -31,6 +31,9 @@ jobs:
       - name: Vérifier la syntaxe Python
         run: python -m compileall -q app
 
+      - name: Exécuter les tests
+        run: python -m pytest tests/ -v
+
   docker-build:
     needs: test
     runs-on: ubuntu-latest
